@@ -1,0 +1,10 @@
+{
+  "name": "Friend Lite",
+  "short_name": "Friend",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#07111f",
+  "theme_color": "#07111f",
+  "orientation": "portrait"
+}

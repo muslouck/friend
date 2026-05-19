@@ -1,0 +1,25 @@
+const chat=document.getElementById("chat"),message=document.getElementById("message"),sendBtn=document.getElementById("sendBtn"),micBtn=document.getElementById("micBtn"),level=document.getElementById("level");
+const followUps={beginner:["What did you do today?","What food do you like?","Where do you live?","Can you tell me about your family?"],elementary:["Why do you think that?","Can you give me one more example?","What happened after that?","How did you feel?"],intermediate:["Can you explain your opinion in more detail?","What would you do differently next time?","What are the advantages and disadvantages?"]};
+const topics={daily:"Tell me about your day in English.",travel:"Imagine you are at the airport. What do you want to say?",work:"Tell me about your job or your dream job.",restaurant:"Imagine you are ordering food at a restaurant. What would you say?"};
+const rules=[
+{p:/\bgoed\b/gi,r:"went",n:"'Go' fiilinin geçmiş zamanı 'goed' değil, 'went' olur."},
+{p:/\b(I|you|we|they|he|she)\s+go\s+(.+?)\s+yesterday\b/gi,r:(m,s,rest)=>`${s} went ${rest} yesterday`,n:"'Yesterday' geçmiş zaman gösterir. Bu yüzden 'go' yerine 'went' kullanılır."},
+{p:/\b(he|she|it)\s+(go|work|live|like|want|need|speak|play)\b/gi,r:(m,s,v)=>`${s} ${v==="go"?"goes":v+"s"}`,n:"Simple present zamanda he/she/it ile fiile -s gelir."},
+{p:/\bI am agree\b/gi,r:"I agree",n:"'Agree' fiildir. 'I am agree' değil, 'I agree' denir."},
+{p:/\bvery like\b/gi,r:"really like",n:"'Very like' doğal değildir. 'Really like' kullanılır."},
+{p:/\bmore better\b/gi,r:"better",n:"'Better' zaten karşılaştırmadır. 'More better' denmez."},
+{p:/\bpeople is\b/gi,r:"people are",n:"'People' çoğul kabul edilir. Bu yüzden 'are' kullanılır."},
+{p:/\bin (Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b/gi,r:"on $1",n:"Haftanın günlerinden önce 'on' kullanılır."},
+{p:/\bI have (\d+) years\b/gi,r:"I am $1 years old",n:"Yaş söylerken 'I am ... years old' kullanılır."},
+{p:/\bmake homework\b/gi,r:"do homework",n:"Ödev yapmak için 'do homework' kullanılır."}
+];
+function esc(t){return String(t).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
+function add(role,html){let d=document.createElement("div");d.className=`msg ${role}`;d.innerHTML=html;chat.appendChild(d);window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});return d}
+function speak(t){if(!("speechSynthesis" in window)){alert("Sesli okuma desteklenmiyor.");return}speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang="en-US";u.rate=.9;speechSynthesis.speak(u)}
+function correct(input){let c=input.trim(),notes=[];for(const rule of rules){if(rule.p.test(c)){rule.p.lastIndex=0;c=c.replace(rule.p,rule.r);notes.push(rule.n)}rule.p.lastIndex=0}c=c.replace(/\bi\b/g,"I");if(c&&!/[.!?]$/.test(c))c+=".";return{c,notes}}
+function reply(t){t=t.toLowerCase();if(t.includes("hello")||t.includes("hi"))return"Hi! Nice to talk with you. How are you today?";if(t.includes("school"))return"That sounds good. School is a great topic for English practice.";if(t.includes("work")||t.includes("job"))return"Nice. Work gives you many things to talk about.";if(t.includes("food")||t.includes("coffee"))return"Great! Food is a very useful daily topic.";return"Good. I understand you. Let's continue the conversation."}
+function send(){let text=message.value.trim();if(!text)return;add("user",`<b>You:</b><br>${esc(text)}`);message.value="";let r=correct(text),rep=reply(text),q=followUps[level.value][Math.floor(Math.random()*followUps[level.value].length)];let corr=r.notes.length?`<span class="bad">Original:</span> ${esc(text)}<br><span class="good">Correct:</span> ${esc(r.c)}`:`<span class="good">No correction needed. Great job!</span>`;let why=r.notes.length?r.notes.map(esc).join("<br>"):"Cümlen anlaşılır ve doğru görünüyor.";let bot=add("bot",`<b>Friend:</b><br>${esc(rep)}<div class="card"><b>Correction</b><br>${corr}</div><div class="card"><b>Why?</b><br>${why}</div><div class="card"><b>Keep talking</b><br>${esc(q)}</div><button class="speak">🔊 Dinle</button>`);bot.querySelector(".speak").onclick=()=>speak(rep+" "+q);speak(rep+" "+q)}
+function mic(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){alert("Mikrofonla yazıya çevirme desteklenmiyor. Android Chrome önerilir.");return}let rec=new SR();rec.lang="en-US";rec.interimResults=false;micBtn.textContent="Dinliyorum...";rec.start();rec.onresult=e=>{message.value=e.results[0][0].transcript;micBtn.textContent="🎙 Konuş"};rec.onerror=()=>{micBtn.textContent="🎙 Konuş";alert("Mikrofon algılanamadı.")};rec.onend=()=>micBtn.textContent="🎙 Konuş"}
+function quickTopic(t){message.value=topics[t]||"Tell me something in English.";message.focus()}
+sendBtn.onclick=send;micBtn.onclick=mic;message.onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send()}};
+add("bot",`<b>Friend:</b><br>Hi! I am Friend Lite. I work without API credits. Write or speak in English, and I will correct you.<div class="card"><b>Try this</b><br>I goed to school yesterday</div>`);

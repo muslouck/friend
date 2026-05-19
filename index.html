@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#07111f"/>
+<title>Friend Lite</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="stylesheet" href="./style.css"/>
+</head>
+<body>
+<main class="app">
+<header class="top">
+<div><p class="eyebrow">Free English Partner</p><h1>Friend Lite</h1></div>
+<select id="level"><option value="beginner">Beginner</option><option value="elementary">Elementary</option><option value="intermediate">Intermediate</option></select>
+</header>
+<section class="hero"><h2>API yok, kredi yok.</h2><p>Yaz veya mikrofona konuş. Friend Lite hataları düzeltir, soru sorar ve İngilizce seslendirir.</p></section>
+<section class="quick"><button onclick="quickTopic('daily')">Daily Talk</button><button onclick="quickTopic('travel')">Travel</button><button onclick="quickTopic('work')">Work</button><button onclick="quickTopic('restaurant')">Restaurant</button></section>
+<section id="chat" class="chat"></section>
+<section class="composer">
+<textarea id="message" placeholder="Write in English... Örn: I goed to school yesterday"></textarea>
+<div class="buttons"><button id="micBtn" class="ghost">🎙 Konuş</button><button id="sendBtn" class="primary">Gönder</button></div>
+</section>
+</main>
+<script src="./script.js"></script>
+</body>
+</html>
